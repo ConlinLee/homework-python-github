@@ -1,0 +1,41 @@
+## This is a sample configuration file. See the nxlog reference manual about the
+## online at http://nxlog.org/nxlog-docs/en/nxlog-reference-manual.html
+
+## Please set the ROOT to the folder your nxlog was installed into,
+## otherwise it will not start.
+
+#define ROOT C:\Program Files\nxlog
+define ROOT C:\Program Files (x86)\nxlog
+
+Moduledir %ROOT%\modules
+CacheDir %ROOT%\data
+Pidfile %ROOT%\data\nxlog.pid
+SpoolDir %ROOT%\data
+LogFile %ROOT%\data\nxlog.log
+
+<Extension syslog>
+  Module    xm_syslog
+</Extension>
+<Input in_eventlog>
+# For windows 2008/vista/7/8/2012/2012R2 and latter use the following:
+  Module      im_msvistalog
+  ReadFromLast TRUE
+  SavePos     TRUE
+</Input>
+
+<Output out_eventlog>
+  Module      om_udp
+  Host        10.165.8.21
+  Port        514
+  Exec $Message = string($SourceName) + ": " + string($EventID) + ": " + $Message;
+  Exec if ($EventID == 18454 or $EventID == 18456 ) { $SyslogFacilityValue = 18; } \
+       else { $SyslogFacilityValue = 13; }
+  Exec if ($EventType == 'ERROR' or $EventType == 'AUDIT_FAILURE') { $SyslogSeverityValue = 3; } \
+       else if ($EventType == 'WARNING')  { $SyslogSeverityValue = 4; } \
+	   else if ($EventType == 'INFO' or $EventType == 'AUDIT_SUCCESS')  { $SyslogSeverityValue = 5; } 
+  Exec to_syslog_bsd();
+</Output>
+
+<Route eventlog>
+  Path        in_eventlog => out_eventlog
+</Route>
