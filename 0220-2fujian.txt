@@ -1,0 +1,7 @@
+.*google\.com.*
+gstatic.com
+google.com.hk
+www.google.com.hk
+www.google.com
+hello
+world
