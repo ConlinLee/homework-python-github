@@ -20,3 +20,4 @@ else:
         m1=m1*(m-1)
         m -= 1
     print(n1//(m1*k1))
+    //hehe
